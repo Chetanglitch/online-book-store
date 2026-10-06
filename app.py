@@ -12,9 +12,12 @@ from database import get_db, init_db
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "bookstore-super-secret-key-2026")
 
-# Initialize database on start
-with app.app_context():
-    init_db()
+# Initialize database on start safely
+try:
+    with app.app_context():
+        init_db()
+except Exception as e:
+    print("Database init warning:", e)
 
 # ----------------- Helper Decorators ----------------- #
 def login_required(f):
