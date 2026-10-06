@@ -1,14 +1,42 @@
 import sqlite3
 import os
+import shutil
 from werkzeug.security import generate_password_hash
 
-DB_NAME = "bookstore.db"
+# Intelligent DB location (local vs Vercel Serverless read-only filesystem)
+if os.environ.get("VERCEL"):
+    DB_NAME = "/tmp/bookstore.db"
+    if not os.path.exists(DB_NAME):
+        # Seed from root bookstore.db if available
+        base_db = os.path.join(os.path.dirname(__file__), "bookstore.db")
+        if os.path.exists(base_db):
+            try:
+                shutil.copy(base_db, DB_NAME)
+            except Exception:
+                pass
+else:
+    DB_NAME = "bookstore.db"
 
 def get_db():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+    global DB_NAME
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        return conn
+    except Exception:
+        DB_NAME = "/tmp/bookstore.db"
+        if not os.path.exists(DB_NAME):
+            base_db = os.path.join(os.path.dirname(__file__), "bookstore.db")
+            if os.path.exists(base_db):
+                try:
+                    shutil.copy(base_db, DB_NAME)
+                except Exception:
+                    pass
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        return conn
 
 def init_db():
     conn = get_db()
