@@ -12,6 +12,24 @@ from database import get_db, init_db
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "bookstore-super-secret-key-2026")
 
+# WSGI Middleware to normalize Vercel serverless paths
+class VercelPathFixMiddleware:
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        path = environ.get('PATH_INFO', '')
+        for prefix in ['/api/index.py', '/api/index', '/api']:
+            if path.startswith(prefix):
+                environ['PATH_INFO'] = path[len(prefix):] or '/'
+                break
+        if not environ.get('PATH_INFO', '').startswith('/'):
+            environ['PATH_INFO'] = '/' + environ.get('PATH_INFO', '')
+        environ['SCRIPT_NAME'] = ''
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
+
 # Initialize database on start safely
 try:
     with app.app_context():
@@ -68,6 +86,9 @@ def inject_global_data():
 
 # ----------------- User Routes ----------------- #
 @app.route("/")
+@app.route("/api/index")
+@app.route("/api/index.py")
+@app.route("/api")
 def index():
     db = get_db()
     featured_books = db.execute(
