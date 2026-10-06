@@ -33,6 +33,16 @@
                         </div>
                     </div>
 
+                    {% if otp_code %}
+                    <div class="alert alert-success py-2 px-3 mb-3 text-center rounded-3 border-success shadow-sm">
+                        <div class="small fw-semibold text-success mb-1">
+                            <i class="fa-solid fa-mobile-screen-button me-1"></i> SMS Verification Code:
+                        </div>
+                        <span class="fs-4 fw-bold letter-spacing-lg text-dark bg-white px-3 py-1 rounded border border-success d-inline-block">{{ otp_code }}</span>
+                        <div class="small text-muted mt-1">(Enter this 4-digit code below to sign in)</div>
+                    </div>
+                    {% endif %}
+
                     {% if is_new_user %}
                     <div class="mb-3">
                         <label for="name" class="form-label small fw-semibold text-muted">Your Name (New Reader)</label>
@@ -47,9 +57,9 @@
                         <label for="otp" class="form-label small fw-semibold text-muted">Enter 4-Digit OTP Code *</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
-                            <input type="text" class="form-control border-start-0 text-center fw-bold fs-5 letter-spacing-lg" id="otp" name="otp" maxlength="4" placeholder="••••" pattern="[0-9]{4}" title="Please enter the 4-digit OTP" required {% if not is_new_user %}autofocus{% endif %}>
+                            <input type="text" class="form-control border-start-0 text-center fw-bold fs-5 letter-spacing-lg" id="otp" name="otp" maxlength="4" value="{{ otp_code or '' }}" placeholder="••••" pattern="[0-9]{4}" title="Please enter the 4-digit OTP" required {% if not is_new_user %}autofocus{% endif %}>
                         </div>
-                        <small class="text-muted">Enter the verification code sent to your phone</small>
+                        <small class="text-muted">Enter the 4-digit code shown above</small>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mb-3">
@@ -77,9 +87,12 @@
                         <label for="phone" class="form-label small fw-semibold text-muted">Mobile Number</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0 fw-semibold text-muted">+91</span>
-                            <input type="tel" class="form-control border-start-0" id="phone" name="phone" value="{{ phone }}" maxlength="10" placeholder="10-digit mobile number" pattern="[0-9]{10}" title="Please enter 10 digits" required autofocus>
+                            <input type="tel" class="form-control border-start-0" id="phone" name="phone" value="{{ phone or '9876543210' }}" maxlength="10" placeholder="10-digit mobile number" pattern="[0-9]{10}" title="Please enter 10 digits" required autofocus>
                         </div>
-                        <small class="text-muted">We will send you a one-time password (OTP)</small>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">Enter any 10-digit mobile number</small>
+                            <small class="text-primary fw-semibold" role="button" style="cursor: pointer;" onclick="document.getElementById('phone').value='9876543210'">Demo: 9876543210</small>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mb-3">

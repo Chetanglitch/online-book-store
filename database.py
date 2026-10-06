@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import shutil
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Intelligent DB location (local vs Vercel Serverless read-only filesystem)
 if os.environ.get("VERCEL"):
@@ -17,7 +17,7 @@ if os.environ.get("VERCEL"):
 else:
     DB_NAME = "bookstore.db"
 
-def get_db():
+def get_db_raw():
     global DB_NAME
     try:
         conn = sqlite3.connect(DB_NAME)
@@ -26,20 +26,22 @@ def get_db():
         return conn
     except Exception:
         DB_NAME = "/tmp/bookstore.db"
-        if not os.path.exists(DB_NAME):
-            base_db = os.path.join(os.path.dirname(__file__), "bookstore.db")
-            if os.path.exists(base_db):
-                try:
-                    shutil.copy(base_db, DB_NAME)
-                except Exception:
-                    pass
         conn = sqlite3.connect(DB_NAME)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         return conn
 
-def init_db():
-    conn = get_db()
+def get_db():
+    conn = get_db_raw()
+    # Check if users table exists
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+    if not cursor.fetchone():
+        init_db(conn)
+    return conn
+
+def init_db(existing_conn=None):
+    conn = existing_conn if existing_conn else get_db_raw()
     cursor = conn.cursor()
 
     # Users table
@@ -143,14 +145,19 @@ def init_db():
     if "phone" not in user_columns:
         cursor.execute("ALTER TABLE users ADD COLUMN phone TEXT")
 
-    # Ensure admin user exists
-    cursor.execute("SELECT id FROM users WHERE email = 'admin@bookstore.com'")
-    if not cursor.fetchone():
+    # Ensure admin user exists with valid credentials
+    cursor.execute("SELECT id, password_hash, role FROM users WHERE email = 'admin@bookstore.com'")
+    admin_row = cursor.fetchone()
+    if not admin_row:
         admin_pass = generate_password_hash("admin123")
         cursor.execute(
             "INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)",
             ("Store Admin", "admin@bookstore.com", admin_pass, "admin")
         )
+    else:
+        if not check_password_hash(admin_row[1], "admin123") or admin_row[2] != "admin":
+            admin_pass = generate_password_hash("admin123")
+            cursor.execute("UPDATE users SET password_hash = ?, role = 'admin' WHERE email = 'admin@bookstore.com'", (admin_pass,))
 
     # Ensure demo student user exists
     cursor.execute("SELECT id FROM users WHERE email = 'student@example.com'")
@@ -174,7 +181,8 @@ def init_db():
         seed_data(conn)
 
     conn.commit()
-    conn.close()
+    if not existing_conn:
+        conn.close()
 
 def seed_data(conn):
     cursor = conn.cursor()

@@ -9,8 +9,16 @@ from flask import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db, init_db
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "bookstore-super-secret-key-2026")
+
+# Enable secure cookie configuration for cloud platforms
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
 
 # WSGI Middleware to normalize Vercel serverless paths
 class VercelPathFixMiddleware:
@@ -34,6 +42,8 @@ class VercelPathFixMiddleware:
         environ['SCRIPT_NAME'] = ''
         return self.wsgi_app(environ, start_response)
 
+# Apply middlewares (ProxyFix handles HTTPS headers, VercelPathFix handles Vercel paths)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 
 # Initialize database on start safely
@@ -501,7 +511,7 @@ def login():
 
             is_new = user is None
             flash(f"OTP sent successfully to +91 {cleaned_phone}! Your Verification Code is: {otp}", "info")
-            return render_template("login.html", step="verify", phone=cleaned_phone, is_new_user=is_new, next=next_page)
+            return render_template("login.html", step="verify", phone=cleaned_phone, otp_code=otp, is_new_user=is_new, next=next_page)
 
         # Step 2: Verify OTP
         elif action == "verify_otp":
@@ -514,7 +524,7 @@ def login():
 
             if not expected_otp or not session_phone or entered_otp != expected_otp or submitted_phone != session_phone:
                 flash("Invalid OTP code. Please enter the correct 4-digit code.", "danger")
-                return render_template("login.html", step="verify", phone=submitted_phone, is_new_user=request.form.get("is_new_user") == "1", next=next_page)
+                return render_template("login.html", step="verify", phone=submitted_phone, otp_code=expected_otp, is_new_user=request.form.get("is_new_user") == "1", next=next_page)
 
             # OTP verified successfully!
             db = get_db()
@@ -543,6 +553,7 @@ def login():
             db.close()
 
             # Set user session
+            session.permanent = True
             session["user_id"] = user_id
             session["user_name"] = final_name
             session["user_email"] = final_email
@@ -568,6 +579,7 @@ def login():
             db.close()
 
             if user and check_password_hash(user["password_hash"], password):
+                session.permanent = True
                 session["user_id"] = user["id"]
                 session["user_name"] = user["name"]
                 session["user_email"] = user["email"]
@@ -595,10 +607,14 @@ def admin_login():
         password = request.form.get("password", "")
 
         db = get_db()
-        user = db.execute("SELECT * FROM users WHERE email = ? AND role = 'admin'", (email,)).fetchone()
+        user = db.execute(
+            "SELECT * FROM users WHERE (email = ? OR (email = 'admin@bookstore.com' AND ? = 'admin')) AND role = 'admin'",
+            (email, email)
+        ).fetchone()
         db.close()
 
         if user and check_password_hash(user["password_hash"], password):
+            session.permanent = True
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             session["user_email"] = user["email"]
@@ -607,6 +623,7 @@ def admin_login():
             return redirect(url_for("admin_dashboard"))
         else:
             flash("Invalid administrator credentials. Access restricted.", "danger")
+            return render_template("admin_login.html", email=email)
 
     return render_template("admin_login.html")
 

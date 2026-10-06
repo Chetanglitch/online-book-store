@@ -303,8 +303,15 @@ h1, h2, h3, .serif-font { font-family: 'Playfair Display', serif; }
 
                     <!-- User Account / Admin Menu -->
                     {% if session.get('user_id') %}
+                    {% if session.get('user_role') == 'admin' %}
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-warning btn-sm fw-bold px-3 py-1 rounded-pill d-flex align-items-center gap-1 shadow-sm" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fa-solid fa-shield-halved"></i> Admin Panel
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item dropdown ms-lg-2">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 user-pill px-3 py-1 rounded-pill" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 user-pill px-3 py-1 rounded-pill" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="user-avatar-circle">
                                 {{ session.get('user_name', 'U')[0]|upper }}
                             </div>
@@ -324,8 +331,13 @@ h1, h2, h3, .serif-font { font-family: 'Playfair Display', serif; }
                             <li><a class="dropdown-item" href="{{ url_for('admin_orders') }}"><i class="fa-solid fa-receipt me-2 text-warning"></i> Customer Orders</a></li>
                             {% endif %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Sign Out</a></li>
+                            <li><a class="dropdown-item text-danger fw-semibold" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Sign Out</a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item ms-lg-1">
+                        <a class="btn btn-outline-danger btn-sm rounded-pill px-2 py-1 text-light border-danger-subtle" href="{{ url_for('logout') }}" title="Sign Out / Logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
                     </li>
                     {% else %}
                     <li class="nav-item ms-lg-2">
@@ -435,14 +447,19 @@ h1, h2, h3, .serif-font { font-family: 'Playfair Display', serif; }
         </div>
     </footer>
 
+    <!-- Bootstrap 5.3 JS Bundle (Required for Navbar, Dropdowns, Dismissible Alerts, Modals) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Main Client Script (Inlined for Guaranteed Compatibility) -->
     <script>
 document.addEventListener("DOMContentLoaded", () => {
     const alerts = document.querySelectorAll('.alert-dismissible');
     alerts.forEach(alert => {
         setTimeout(() => {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            if (bsAlert) { bsAlert.close(); }
+            if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                if (bsAlert) { bsAlert.close(); }
+            }
         }, 6000);
     });
     const printReceiptBtn = document.getElementById("printReceiptBtn");
