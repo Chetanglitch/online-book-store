@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark px-3 py-1 text-uppercase fw-bold">Admin Portal</span>
+                <h2 class="fw-bold mb-0">Store Overview</h2>
+            </div>
+            <p class="text-muted small mb-0 mt-1">Manage catalog inventory, check sales and process student orders.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_add_book') }}" class="btn btn-primary rounded-pill px-3 shadow-sm">
+                <i class="fa-solid fa-plus me-1"></i> Add New Book
+            </a>
+            <a href="{{ url_for('admin_books') }}" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="fa-solid fa-book me-1"></i> Manage Books
+            </a>
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary rounded-pill px-3">
+                <i class="fa-solid fa-receipt me-1"></i> Manage Orders
+            </a>
+        </div>
+    </div>
+
+    <!-- 4 Metric Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon blue">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Total Revenue</span>
+                    <h4 class="fw-bold mb-0">₹{{ "%.2f"|format(total_sales) }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon green">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Total Orders</span>
+                    <h4 class="fw-bold mb-0">{{ total_orders }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon amber">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Books in Catalog</span>
+                    <h4 class="fw-bold mb-0">{{ total_books }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="metric-card">
+                <div class="metric-icon purple">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <span class="text-muted small d-block">Registered Customers</span>
+                    <h4 class="fw-bold mb-0">{{ total_users }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders Section -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i> Recent Customer Orders</h5>
+            <a href="{{ url_for('admin_orders') }}" class="text-decoration-none small fw-semibold">View All Orders &rarr;</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table custom-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Order #</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if recent_orders %}
+                    {% for ord in recent_orders %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-primary">{{ ord.order_number }}</td>
+                        <td>
+                            <div>{{ ord.full_name }}</div>
+                            <small class="text-muted">{{ ord.email }}</small>
+                        </td>
+                        <td class="small text-muted">{{ ord.created_at[:16] if ord.created_at else '' }}</td>
+                        <td class="fw-bold">₹{{ "%.2f"|format(ord.total_amount) }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ ord.payment_method }}</span></td>
+                        <td>
+                            <span class="badge {% if ord.status == 'Delivered' %}bg-success{% elif ord.status == 'Shipped' %}bg-info text-dark{% elif ord.status == 'Cancelled' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ ord.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No orders received yet.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

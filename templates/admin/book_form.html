@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{% if book %}Edit Book - {{ book.title }}{% else %}Add New Book{% endif %} - Admin KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="{{ url_for('admin_books') }}" class="btn btn-outline-secondary btn-sm rounded-circle">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h2 class="fw-bold mb-0">{% if book %}Edit Book Details{% else %}Add New Book to Inventory{% endif %}</h2>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5">
+                <form method="POST" action="{% if book %}{{ url_for('admin_edit_book', book_id=book.id) }}{% else %}{{ url_for('admin_add_book') }}{% endif %}">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="title" class="form-label small fw-semibold text-muted">Book Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ book.title if book else '' }}" placeholder="e.g. Operating System Concepts" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="author" class="form-label small fw-semibold text-muted">Author Name *</label>
+                            <input type="text" class="form-control" id="author" name="author" value="{{ book.author if book else '' }}" placeholder="e.g. Abraham Silberschatz" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="category" class="form-label small fw-semibold text-muted">Category / Genre *</label>
+                            <select class="form-select" id="category" name="category" required>
+                                {% for cat in ['Computer Science', 'Fiction', 'Self-Help', 'Finance', 'History', 'Science', 'Biography'] %}
+                                <option value="{{ cat }}" {% if book and book.category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="price" class="form-label small fw-semibold text-muted">Selling Price (₹) *</label>
+                            <input type="number" step="0.01" class="form-control" id="price" name="price" value="{{ book.price if book else '' }}" placeholder="499.00" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="original_price" class="form-label small fw-semibold text-muted">Original MRP Price (₹)</label>
+                            <input type="number" step="0.01" class="form-control" id="original_price" name="original_price" value="{{ book.original_price if book else '' }}" placeholder="699.00">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="stock" class="form-label small fw-semibold text-muted">Available Stock *</label>
+                            <input type="number" class="form-control" id="stock" name="stock" value="{{ book.stock if book else '15' }}" min="0" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="cover_image" class="form-label small fw-semibold text-muted">Cover Image URL</label>
+                            <input type="url" class="form-control" id="cover_image" name="cover_image" value="{{ book.cover_image if book else '' }}" placeholder="https://images.unsplash.com/...">
+                            <small class="text-muted">Direct image URL (e.g., Unsplash, Cloudinary, or any web image link)</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="description" class="form-label small fw-semibold text-muted">Description / Summary</label>
+                            <textarea class="form-control" id="description" name="description" rows="5" placeholder="Detailed synopsis or syllabus details for this book...">{{ book.description if book else '' }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="featured" name="featured" value="1" {% if book and book.featured == 1 %}checked{% endif %}>
+                                <label class="form-check-label fw-semibold" for="featured">
+                                    Feature this book on the Home Page Bestsellers section
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4 d-flex gap-3">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold shadow-sm">
+                                <i class="fa-solid fa-floppy-disk me-2"></i> Save Book
+                            </button>
+                            <a href="{{ url_for('admin_books') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <h2 class="fw-bold mb-4"><i class="fa-solid fa-cart-shopping me-2 text-primary"></i> Your Shopping Cart</h2>
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Cart Items List (Left Column) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="table-responsive">
+                    <table class="table custom-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Book</th>
+                                <th>Price</th>
+                                <th style="min-width: 140px;">Quantity</th>
+                                <th>Total</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="{{ item.cover_image }}" alt="{{ item.title }}" class="rounded shadow-sm" style="width: 55px; height: 75px; object-fit: cover;">
+                                        <div>
+                                            <a href="{{ url_for('book_detail', book_id=item.book_id) }}" class="fw-bold text-dark text-decoration-none d-block mb-1 text-truncate" style="max-width: 260px;">
+                                                {{ item.title }}
+                                            </a>
+                                            <small class="text-muted d-block">By {{ item.author }}</small>
+                                            <small class="text-success"><i class="fa-solid fa-check me-1"></i> In Stock</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">₹{{ "%.2f"|format(item.price) }}</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <!-- Decrease button -->
+                                        <form action="{{ url_for('update_cart', book_id=item.book_id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle p-0" style="width: 28px; height: 28px;">
+                                                <i class="fa-solid fa-minus" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                        </form>
+
+                                        <span class="fw-bold px-3 py-1 bg-light border rounded text-center" style="min-width: 38px;">
+                                            {{ item.quantity }}
+                                        </span>
+
+                                        <!-- Increase button -->
+                                        <form action="{{ url_for('update_cart', book_id=item.book_id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm rounded-circle p-0" style="width: 28px; height: 28px;" {% if item.quantity >= item.stock %}disabled{% endif %}>
+                                                <i class="fa-solid fa-plus" style="font-size: 0.75rem;"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark">₹{{ "%.2f"|format(item.price * item.quantity) }}</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{{ url_for('remove_from_cart', book_id=item.book_id) }}" method="POST" onsubmit="return confirm('Remove this item from your cart?');">
+                                        <button type="submit" class="btn btn-light text-danger btn-sm rounded-circle" title="Remove book">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('books') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fa-solid fa-arrow-left me-2"></i> Continue Shopping
+                </a>
+            </div>
+        </div>
+
+        <!-- Order Summary (Right Column) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3">Order Summary</h5>
+
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Subtotal ({{ cart_items|length }} items)</span>
+                    <span class="fw-semibold">₹{{ "%.2f"|format(subtotal) }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                    <span class="text-muted">Standard Delivery</span>
+                    <span>
+                        {% if shipping == 0 %}
+                        <span class="text-success fw-bold">FREE</span>
+                        {% else %}
+                        <span class="fw-semibold">₹{{ "%.2f"|format(shipping) }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if subtotal < 500 %}
+                <div class="p-2 my-2 bg-warning-subtle text-warning-emphasis rounded small text-center">
+                    <i class="fa-solid fa-truck-fast me-1"></i> Add <strong>₹{{ "%.2f"|format(500 - subtotal) }}</strong> more to get <strong>Free Delivery</strong>!
+                </div>
+                {% else %}
+                <div class="p-2 my-2 bg-success-subtle text-success rounded small text-center fw-semibold">
+                    <i class="fa-solid fa-circle-check me-1"></i> You have unlocked Free Delivery!
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between py-3 mb-4 border-bottom">
+                    <span class="fs-5 fw-bold">Total Amount</span>
+                    <span class="fs-4 fw-bold text-primary">₹{{ "%.2f"|format(total) }}</span>
+                </div>
+
+                <a href="{{ url_for('checkout') }}" class="btn btn-accent btn-lg w-100 rounded-pill py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    Proceed to Checkout <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+                <div class="text-center mt-3 text-muted small">
+                    <i class="fa-solid fa-lock me-1"></i> 100% Safe & Secure Checkout
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart Screen -->
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+        <div class="mb-4">
+            <span class="display-3 text-muted opacity-50"><i class="fa-solid fa-cart-arrow-down"></i></span>
+        </div>
+        <h3 class="fw-bold mb-2">Your Shopping Cart is Empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added any books to your cart yet.</p>
+        <div>
+            <a href="{{ url_for('books') }}" class="btn btn-primary rounded-pill px-5 py-2 shadow-sm">
+                <i class="fa-solid fa-book-open me-2"></i> Browse Our Collection
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

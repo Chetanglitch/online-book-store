@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('books') }}" class="text-decoration-none">Books</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('books', category=book.category) }}" class="text-decoration-none">{{ book.category }}</a></li>
+            <li class="breadcrumb-item active text-truncate" style="max-width: 300px;" aria-current="page">{{ book.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Main Detail Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="card-body p-4 p-lg-5">
+            <div class="row g-5 align-items-start">
+                <!-- Book Image Column -->
+                <div class="col-lg-5 text-center">
+                    <div class="detail-cover-box position-relative">
+                        <img src="{{ book.cover_image }}" alt="{{ book.title }}" class="img-fluid rounded-3">
+                        {% if book.original_price and book.original_price > book.price %}
+                        {% set discount = ((book.original_price - book.price) / book.original_price * 100)|round|int %}
+                        <span class="position-absolute top-0 start-0 m-3 badge bg-danger p-2 fs-6">
+                            {{ discount }}% OFF
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Book Information Column -->
+                <div class="col-lg-7">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge bg-primary text-uppercase px-3 py-1">{{ book.category }}</span>
+                        {% if book.stock > 0 %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">
+                            <i class="fa-solid fa-check me-1"></i> In Stock ({{ book.stock }} copies left)
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1">
+                            <i class="fa-solid fa-xmark me-1"></i> Out of Stock
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <h1 class="h2 fw-bold mb-2">{{ book.title }}</h1>
+                    <p class="text-muted fs-6 mb-3">Written by <strong class="text-dark">{{ book.author }}</strong></p>
+
+                    <!-- Rating Stars -->
+                    <div class="d-flex align-items-center gap-2 mb-4 pb-3 border-bottom">
+                        <div class="rating-stars fs-5">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="fw-bold fs-5">{{ book.rating }}</span>
+                        <span class="text-muted">|</span>
+                        <span class="text-muted">{{ book.rating_count }} Customer Reviews</span>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="d-flex align-items-baseline gap-3 mb-4">
+                        <span class="display-6 fw-bold text-dark">₹{{ "%.2f"|format(book.price) }}</span>
+                        {% if book.original_price and book.original_price > book.price %}
+                        <span class="fs-4 text-decoration-line-through text-muted">₹{{ "%.2f"|format(book.original_price) }}</span>
+                        <span class="badge bg-danger-subtle text-danger fw-bold">Save ₹{{ "%.2f"|format(book.original_price - book.price) }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-uppercase text-muted small">Description / Synopsis</h6>
+                        <p class="text-secondary leading-relaxed mb-0">
+                            {{ book.description or 'A classic recommended book for students and general enthusiasts alike.' }}
+                        </p>
+                    </div>
+
+                    <!-- Add to Cart Form -->
+                    {% if book.stock > 0 %}
+                    <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST" class="mb-4">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <label for="quantity-input" class="fw-semibold small text-muted">Quantity:</label>
+                                <select id="quantity-input" name="quantity" class="form-select" style="width: 100px;">
+                                    {% for i in range(1, [book.stock + 1, 6]|min) %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="d-block text-white small opacity-0">Action</label>
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                                    <i class="fa-solid fa-cart-shopping"></i> Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning py-2 mb-4">
+                        <i class="fa-solid fa-clock me-1"></i> This book is currently sold out. Please check back later.
+                    </div>
+                    {% endif %}
+
+                    <!-- Perks List -->
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="row g-2 small text-muted">
+                            <div class="col-6"><i class="fa-solid fa-truck-fast text-primary me-2"></i> Fast Dispatch (24-48 hrs)</div>
+                            <div class="col-6"><i class="fa-solid fa-rotate-left text-primary me-2"></i> 7-Day Replacement Policy</div>
+                            <div class="col-6"><i class="fa-solid fa-money-bill-wave text-primary me-2"></i> Cash on Delivery Eligible</div>
+                            <div class="col-6"><i class="fa-solid fa-shield text-primary me-2"></i> 100% Genuine Textbook</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews and Feedback Section -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Customer Reviews ({{ reviews|length }})</h4>
+                    <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-star me-1"></i> {{ book.rating }} / 5.0</span>
+                </div>
+
+                {% if reviews %}
+                <div class="review-list">
+                    {% for rev in reviews %}
+                    <div class="review-item pb-3 mb-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="user-avatar-circle" style="width: 26px; height: 26px; font-size: 0.75rem;">
+                                    {{ rev.user_name[0]|upper }}
+                                </div>
+                                <strong class="small">{{ rev.user_name }}</strong>
+                            </div>
+                            <small class="text-muted">{{ rev.created_at[:10] if rev.created_at else 'Verified Buyer' }}</small>
+                        </div>
+                        <div class="rating-stars mb-2" style="font-size: 0.8rem;">
+                            {% for s in range(rev.rating) %}
+                            <i class="fa-solid fa-star"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="small text-secondary mb-0">{{ rev.comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted py-3">No reviews yet for this title. Be the first to share your thoughts!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Add Review Form -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h4 class="fw-bold mb-3">Leave a Review</h4>
+                {% if session.get('user_id') %}
+                <form action="{{ url_for('add_review', book_id=book.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label for="rating-select" class="form-label fw-semibold small">Your Rating</label>
+                        <select class="form-select" id="rating-select" name="rating">
+                            <option value="5">⭐⭐⭐⭐⭐ - Excellent (5 Stars)</option>
+                            <option value="4">⭐⭐⭐⭐ - Good (4 Stars)</option>
+                            <option value="3">⭐⭐⭐ - Average (3 Stars)</option>
+                            <option value="2">⭐⭐ - Below Average (2 Stars)</option>
+                            <option value="1">⭐ - Poor (1 Star)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="comment-text" class="form-label fw-semibold small">Your Feedback</label>
+                        <textarea class="form-control" id="comment-text" name="comment" rows="4" placeholder="How was the book content, language, or print quality?" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary rounded-pill w-100 fw-semibold">
+                        Submit Review
+                    </button>
+                </form>
+                {% else %}
+                <div class="p-4 bg-light text-center rounded-3">
+                    <i class="fa-solid fa-pen-to-square fs-2 text-muted mb-3"></i>
+                    <h6>Want to share your review?</h6>
+                    <p class="small text-muted mb-3">Please sign in to write verified feedback for other students.</p>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm rounded-pill px-4">Sign In Now</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Books -->
+    {% if related_books %}
+    <div class="mb-5">
+        <h4 class="fw-bold mb-4">You May Also Like in {{ book.category }}</h4>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
+            {% for rel in related_books %}
+            <div class="col">
+                <div class="book-card h-100 shadow-sm">
+                    <a href="{{ url_for('book_detail', book_id=rel.id) }}" class="text-decoration-none">
+                        <div class="book-card-cover-wrapper">
+                            <img src="{{ rel.cover_image }}" alt="{{ rel.title }}" loading="lazy">
+                        </div>
+                    </a>
+                    <div class="book-card-body">
+                        <h6 class="book-card-title">
+                            <a href="{{ url_for('book_detail', book_id=rel.id) }}" class="text-dark text-decoration-none">
+                                {{ rel.title }}
+                            </a>
+                        </h6>
+                        <p class="book-card-author mb-auto">By {{ rel.author }}</p>
+                        <div class="mt-2">
+                            <span class="fw-bold text-dark">₹{{ "%.2f"|format(rel.price) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

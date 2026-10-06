@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Sign In - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-sm-5">
+                <div class="text-center mb-4">
+                    <span class="fs-1 text-warning"><i class="fa-solid fa-shield-halved"></i></span>
+                    <h3 class="fw-bold mt-2">Admin Portal</h3>
+                    <p class="text-muted small">Restricted access for bookstore management</p>
+                </div>
+
+                <form action="{{ url_for('admin_login') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label small fw-semibold text-muted">Admin Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control border-start-0" id="email" name="email" placeholder="admin@example.com" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label small fw-semibold text-muted">Secret Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mb-3">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In to Dashboard
+                    </button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('login') }}" class="small text-muted text-decoration-none">
+                        &larr; Return to Customer Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

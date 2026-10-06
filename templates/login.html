@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-sm-5">
+                <!-- Brand Header -->
+                <div class="text-center mb-4">
+                    <span class="brand-icon fs-1"><i class="fa-solid fa-book-open-reader"></i></span>
+                    <h3 class="fw-bold mt-2">Welcome to KitabKosh</h3>
+                    <p class="text-muted small">Sign in with your mobile number & instant OTP</p>
+                </div>
+
+                <!-- OTP Login Form -->
+                {% if step == 'verify' %}
+                <!-- STEP 2: VERIFY OTP -->
+                <form action="{{ url_for('login') }}" method="POST">
+                    <input type="hidden" name="action" value="verify_otp">
+                    <input type="hidden" name="phone" value="{{ phone }}">
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <input type="hidden" name="is_new_user" value="{{ '1' if is_new_user else '0' }}">
+
+                    <div class="p-3 bg-light rounded-3 border mb-3 text-center">
+                        <small class="text-muted d-block">OTP sent to mobile number</small>
+                        <strong class="fs-6 text-dark">+91 {{ phone }}</strong>
+                        <div class="mt-1">
+                            <a href="{{ url_for('login', next=next) }}" class="small text-primary text-decoration-none">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Change Number
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if is_new_user %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label small fw-semibold text-muted">Your Name (New Reader)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" id="name" name="name" placeholder="Enter your full name" required autofocus>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="otp" class="form-label small fw-semibold text-muted">Enter 4-Digit OTP Code *</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-key text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 text-center fw-bold fs-5 letter-spacing-lg" id="otp" name="otp" maxlength="4" placeholder="••••" pattern="[0-9]{4}" title="Please enter the 4-digit OTP" required {% if not is_new_user %}autofocus{% endif %}>
+                        </div>
+                        <small class="text-muted">Enter the verification code sent to your phone</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mb-3">
+                        <i class="fa-solid fa-shield-halved me-1"></i> Verify & Sign In
+                    </button>
+                </form>
+
+                <!-- Resend OTP button -->
+                <form action="{{ url_for('login') }}" method="POST" class="text-center mb-4">
+                    <input type="hidden" name="action" value="send_otp">
+                    <input type="hidden" name="phone" value="{{ phone }}">
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <button type="submit" class="btn btn-link btn-sm text-decoration-none text-muted p-0">
+                        Didn't receive code? <strong class="text-primary">Resend OTP</strong>
+                    </button>
+                </form>
+
+                {% else %}
+                <!-- STEP 1: ENTER PHONE NUMBER -->
+                <form action="{{ url_for('login') }}" method="POST">
+                    <input type="hidden" name="action" value="send_otp">
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label small fw-semibold text-muted">Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 fw-semibold text-muted">+91</span>
+                            <input type="tel" class="form-control border-start-0" id="phone" name="phone" value="{{ phone }}" maxlength="10" placeholder="10-digit mobile number" pattern="[0-9]{10}" title="Please enter 10 digits" required autofocus>
+                        </div>
+                        <small class="text-muted">We will send you a one-time password (OTP)</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-semibold mb-3">
+                        Get OTP <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </button>
+                </form>
+                {% endif %}
+
+                <!-- Footer Discreet Links -->
+                <hr class="my-4">
+                <div class="text-center">
+                    <a href="{{ url_for('admin_login') }}" class="small text-decoration-none text-secondary">
+                        <i class="fa-solid fa-user-shield me-1"></i> Store Staff / Admin Portal &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

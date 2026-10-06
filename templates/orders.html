@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fa-solid fa-box-open me-2 text-primary"></i> My Order History</h2>
+            <p class="text-muted small mb-0">Track all your current and past book deliveries.</p>
+        </div>
+        <a href="{{ url_for('books') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+            <i class="fa-solid fa-plus me-1"></i> Order More
+        </a>
+    </div>
+
+    {% if orders_with_items %}
+    <div class="row g-4">
+        {% for entry in orders_with_items %}
+        {% set order = entry.order %}
+        {% set items = entry.order_items %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-light border-bottom p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div>
+                            <span class="text-muted small d-block">Order Placed</span>
+                            <span class="fw-semibold small">{{ order.created_at[:16] if order.created_at else 'Recent' }}</span>
+                        </div>
+                        <div class="vr d-none d-md-block"></div>
+                        <div>
+                            <span class="text-muted small d-block">Order #</span>
+                            <span class="fw-bold text-dark small">{{ order.order_number }}</span>
+                        </div>
+                        <div class="vr d-none d-md-block"></div>
+                        <div>
+                            <span class="text-muted small d-block">Total Paid</span>
+                            <span class="fw-bold text-primary small">₹{{ "%.2f"|format(order.total_amount) }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="badge {% if order.status == 'Delivered' %}bg-success{% elif order.status == 'Shipped' %}bg-info text-dark{% elif order.status == 'Cancelled' %}bg-danger{% else %}bg-warning text-dark{% endif %} px-3 py-2 rounded-pill">
+                            <i class="fa-solid {% if order.status == 'Delivered' %}fa-check-double{% elif order.status == 'Shipped' %}fa-truck{% elif order.status == 'Cancelled' %}fa-ban{% else %}fa-clock{% endif %} me-1"></i>
+                            {{ order.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <h6 class="fw-bold small text-muted text-uppercase mb-3">Items ({{ items|length }})</h6>
+                            <div class="d-flex flex-column gap-3">
+                                {% for item in items %}
+                                <div class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">{{ item.title }}</h6>
+                                        <small class="text-muted">Quantity: {{ item.quantity }} × ₹{{ "%.2f"|format(item.price) }}</small>
+                                    </div>
+                                    <span class="fw-bold text-dark">₹{{ "%.2f"|format(item.price * item.quantity) }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 border-start-md ps-md-4">
+                            <h6 class="fw-bold small text-muted text-uppercase mb-3">Delivery Information</h6>
+                            <p class="small mb-1"><strong>{{ order.full_name }}</strong></p>
+                            <p class="small text-muted mb-1">{{ order.address }}</p>
+                            <p class="small text-muted mb-1">{{ order.city }} - {{ order.pincode }}</p>
+                            <p class="small text-muted mb-3"><i class="fa-solid fa-phone me-1"></i> {{ order.phone }}</p>
+                            
+                            <div class="p-2 bg-light rounded small text-muted">
+                                <span class="d-block">Payment Mode: <strong>{{ order.payment_method }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+        <div class="mb-3">
+            <span class="text-muted display-4"><i class="fa-solid fa-box-open"></i></span>
+        </div>
+        <h4 class="fw-bold mb-2">No Orders Yet</h4>
+        <p class="text-muted mb-4">You haven't placed any book orders with us yet.</p>
+        <div>
+            <a href="{{ url_for('books') }}" class="btn btn-primary rounded-pill px-4">
+                <i class="fa-solid fa-book me-2"></i> Start Browsing
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

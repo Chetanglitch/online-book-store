@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Discover Best Books & Textbooks{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Banner Section -->
+    <section class="hero-section p-4 p-md-5 mb-5 shadow-sm">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3">
+                    <i class="fa-solid fa-fire me-1"></i> Special Academic & Fiction Offers
+                </span>
+                <h1 class="hero-title mb-3">
+                    Expand Your Horizons With Every Page You Read.
+                </h1>
+                <p class="lead text-light mb-4" style="max-width: 580px; opacity: 0.9;">
+                    From engineering textbooks and programming algorithms to bestselling fiction and personal finance. Get books delivered right to your dorm or doorstep.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('books') }}" class="btn btn-accent btn-lg px-4 py-2 rounded-pill shadow-sm">
+                        <i class="fa-solid fa-compass me-2"></i> Explore All Books
+                    </a>
+                    <a href="{{ url_for('books', category='Computer Science') }}" class="btn btn-outline-light btn-lg px-4 py-2 rounded-pill">
+                        <i class="fa-solid fa-code me-2"></i> CS & Tech Specials
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 text-center d-none d-lg-block">
+                <div class="position-relative d-inline-block">
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&auto=format&fit=crop&q=80" alt="Books Collection" class="img-fluid rounded-4 shadow-lg border border-3 border-secondary" style="max-height: 340px; object-fit: cover;">
+                    <div class="position-absolute bottom-0 start-0 translate-middle-y bg-white text-dark p-3 rounded-3 shadow-lg text-start ms-n3 border" style="max-width: 220px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-warning fs-4"><i class="fa-solid fa-star"></i></span>
+                            <div>
+                                <h6 class="mb-0 fw-bold">4.9 / 5.0 Rating</h6>
+                                <small class="text-muted">Over 1,200+ Readers</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Strip -->
+    <section class="features-strip mb-5">
+        <div class="row g-4 text-start">
+            <div class="col-md-3 col-6">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Free Shipping</h6>
+                        <small class="text-muted">On all orders over ₹500</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-shield-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">100% Genuine</h6>
+                        <small class="text-muted">Direct from publishers</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Student Prices</h6>
+                        <small class="text-muted">Best discounts & deals</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0">Quick Support</h6>
+                        <small class="text-muted">Dedicated student help</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Strip -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">Browse by Category</h3>
+            <a href="{{ url_for('books') }}" class="text-decoration-none fw-semibold text-primary">View All &rarr;</a>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('books') }}" class="category-pill active">
+                <i class="fa-solid fa-layer-group me-1"></i> All Categories
+            </a>
+            {% for cat in global_categories %}
+            <a href="{{ url_for('books', category=cat) }}" class="category-pill">
+                {{ cat }}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Featured Books Section -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Featured & Bestsellers</h2>
+                <p class="text-muted mb-0 small">Handpicked books recommended by professors, coders, and voracious readers.</p>
+            </div>
+            <a href="{{ url_for('books') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                See All
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for book in featured_books %}
+            <div class="col">
+                <div class="book-card h-100">
+                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="text-decoration-none">
+                        <div class="book-card-cover-wrapper">
+                            <img src="{{ book.cover_image }}" alt="{{ book.title }}" loading="lazy">
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-primary text-uppercase" style="font-size: 0.72rem;">
+                                {{ book.category }}
+                            </span>
+                            {% if book.original_price and book.original_price > book.price %}
+                            {% set discount = ((book.original_price - book.price) / book.original_price * 100)|round|int %}
+                            <span class="position-absolute top-0 end-0 m-2 badge bg-danger" style="font-size: 0.72rem;">
+                                -{{ discount }}% OFF
+                            </span>
+                            {% endif %}
+                        </div>
+                    </a>
+                    <div class="book-card-body">
+                        <div class="d-flex align-items-center gap-1 mb-1">
+                            <div class="rating-stars">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <small class="fw-bold">{{ book.rating }}</small>
+                            <small class="text-muted">({{ book.rating_count }})</small>
+                        </div>
+                        <h5 class="book-card-title">
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="text-dark text-decoration-none">
+                                {{ book.title }}
+                            </a>
+                        </h5>
+                        <p class="book-card-author mb-auto">By {{ book.author }}</p>
+                        
+                        <div class="d-flex align-items-baseline gap-2 my-2">
+                            <span class="book-card-price">₹{{ "%.2f"|format(book.price) }}</span>
+                            {% if book.original_price and book.original_price > book.price %}
+                            <span class="book-card-original-price">₹{{ "%.2f"|format(book.original_price) }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-2">
+                            {% if book.stock > 0 %}
+                            <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2">
+                                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-sm btn-secondary w-100 rounded-pill" disabled>
+                                Out of Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Recent Arrivals Section -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">New In The Catalog</h2>
+                <p class="text-muted mb-0 small">Fresh editions added to our online inventory.</p>
+            </div>
+            <a href="{{ url_for('books', sort='newest') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                View New Releases
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for book in recent_books[:4] %}
+            <div class="col">
+                <div class="book-card h-100">
+                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="text-decoration-none">
+                        <div class="book-card-cover-wrapper">
+                            <img src="{{ book.cover_image }}" alt="{{ book.title }}" loading="lazy">
+                            <span class="position-absolute top-0 start-0 m-2 badge bg-secondary text-uppercase" style="font-size: 0.72rem;">
+                                {{ book.category }}
+                            </span>
+                        </div>
+                    </a>
+                    <div class="book-card-body">
+                        <div class="d-flex align-items-center gap-1 mb-1">
+                            <div class="rating-stars">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <small class="fw-bold">{{ book.rating }}</small>
+                            <small class="text-muted">({{ book.rating_count }})</small>
+                        </div>
+                        <h5 class="book-card-title">
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="text-dark text-decoration-none">
+                                {{ book.title }}
+                            </a>
+                        </h5>
+                        <p class="book-card-author mb-auto">By {{ book.author }}</p>
+                        
+                        <div class="d-flex align-items-baseline gap-2 my-2">
+                            <span class="book-card-price">₹{{ "%.2f"|format(book.price) }}</span>
+                            {% if book.original_price and book.original_price > book.price %}
+                            <span class="book-card-original-price">₹{{ "%.2f"|format(book.original_price) }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-2">
+                            {% if book.stock > 0 %}
+                            <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-outline-primary w-100 rounded-pill d-flex align-items-center justify-content-center gap-2">
+                                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-sm btn-secondary w-100 rounded-pill" disabled>
+                                Out of Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Metrics & Trust Section -->
+    <section class="bg-white p-4 p-md-5 rounded-4 border mb-5 shadow-sm text-center">
+        <div class="row g-4">
+            <div class="col-6 col-md-3 border-end">
+                <h2 class="display-6 fw-bold text-primary mb-1">{{ stats.books_count }}+</h2>
+                <p class="text-muted small mb-0">Curated Titles</p>
+            </div>
+            <div class="col-6 col-md-3 border-end">
+                <h2 class="display-6 fw-bold text-success mb-1">{{ stats.categories_count }}</h2>
+                <p class="text-muted small mb-0">Diverse Genres</p>
+            </div>
+            <div class="col-6 col-md-3 border-end">
+                <h2 class="display-6 fw-bold text-warning mb-1">{{ stats.reviews_count }}+</h2>
+                <p class="text-muted small mb-0">Reader Reviews</p>
+            </div>
+            <div class="col-6 col-md-3">
+                <h2 class="display-6 fw-bold text-danger mb-1">{{ stats.users_count }}+</h2>
+                <p class="text-muted small mb-0">Active Readers</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

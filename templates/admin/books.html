@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Books - Admin KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fa-solid fa-arrow-left"></i></a>
+                <h2 class="fw-bold mb-0">Book Inventory Management</h2>
+            </div>
+            <p class="text-muted small mb-0 mt-1">Total {{ books|length }} books in current inventory.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin_add_book') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                <i class="fa-solid fa-plus me-2"></i> Add New Book
+            </a>
+        </div>
+    </div>
+
+    <!-- Books Inventory Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Cover</th>
+                        <th>Title & Author</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Rating</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in books %}
+                    <tr>
+                        <td class="ps-4 text-muted small fw-bold">#{{ b.id }}</td>
+                        <td>
+                            <img src="{{ b.cover_image }}" alt="{{ b.title }}" class="rounded shadow-sm" style="width: 40px; height: 55px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <a href="{{ url_for('book_detail', book_id=b.id) }}" class="fw-bold text-dark text-decoration-none d-block text-truncate" style="max-width: 280px;" target="_blank">
+                                {{ b.title }}
+                            </a>
+                            <small class="text-muted">By {{ b.author }}</small>
+                            {% if b.featured == 1 %}
+                            <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Featured</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">{{ b.category }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-dark">₹{{ "%.2f"|format(b.price) }}</span>
+                            {% if b.original_price and b.original_price > b.price %}
+                            <small class="text-muted text-decoration-line-through d-block">₹{{ "%.2f"|format(b.original_price) }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if b.stock <= 5 %}
+                            <span class="badge bg-danger">{{ b.stock }} left</span>
+                            {% else %}
+                            <span class="badge bg-success">{{ b.stock }} in stock</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-1 small">
+                                <span class="text-warning"><i class="fa-solid fa-star"></i></span>
+                                <span class="fw-bold">{{ b.rating }}</span>
+                            </div>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('admin_edit_book', book_id=b.id) }}" class="btn btn-sm btn-outline-primary rounded-circle" title="Edit book">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <form action="{{ url_for('admin_delete_book', book_id=b.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete \'{{ b.title }}\'?');" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete book">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

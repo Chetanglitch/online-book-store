@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Orders - Admin KitabKosh{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fa-solid fa-arrow-left"></i></a>
+                <h2 class="fw-bold mb-0">Customer Orders Management</h2>
+            </div>
+            <p class="text-muted small mb-0 mt-1">Review orders and update delivery status for customers.</p>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    {% if orders_with_items %}
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="table-responsive">
+            <table class="table custom-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Order # & Date</th>
+                        <th>Customer & Shipping</th>
+                        <th>Ordered Books</th>
+                        <th>Total & Payment</th>
+                        <th class="text-end pe-4">Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in orders_with_items %}
+                    {% set ord = entry.order %}
+                    {% set items = entry.order_items %}
+                    <tr>
+                        <td class="ps-4">
+                            <span class="fw-bold text-primary d-block">{{ ord.order_number }}</span>
+                            <small class="text-muted">{{ ord.created_at[:16] if ord.created_at else '' }}</small>
+                        </td>
+                        <td>
+                            <strong class="d-block">{{ ord.full_name }}</strong>
+                            <small class="text-muted d-block">{{ ord.email }} | {{ ord.phone }}</small>
+                            <small class="text-secondary text-truncate d-block" style="max-width: 250px;" title="{{ ord.address }}, {{ ord.city }} - {{ ord.pincode }}">
+                                {{ ord.address }}, {{ ord.city }} - {{ ord.pincode }}
+                            </small>
+                        </td>
+                        <td>
+                            <div class="small">
+                                {% for item in items %}
+                                <div class="text-truncate" style="max-width: 240px;">
+                                    <span class="fw-semibold">{{ item.quantity }}x</span> {{ item.title }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-dark d-block">₹{{ "%.2f"|format(ord.total_amount) }}</span>
+                            <span class="badge bg-light text-dark border">{{ ord.payment_method }}</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <form action="{{ url_for('admin_update_order_status', order_id=ord.id) }}" method="POST" class="d-flex align-items-center justify-content-end gap-2">
+                                <select name="status" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="Processing" {% if ord.status == 'Processing' %}selected{% endif %}>Processing</option>
+                                    <option value="Shipped" {% if ord.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                    <option value="Delivered" {% if ord.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="Cancelled" {% if ord.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Update status">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </form>
+                            <div class="mt-1">
+                                <span class="badge {% if ord.status == 'Delivered' %}bg-success{% elif ord.status == 'Shipped' %}bg-info text-dark{% elif ord.status == 'Cancelled' %}bg-danger{% else %}bg-warning text-dark{% endif %}" style="font-size: 0.7rem;">
+                                    Current: {{ ord.status }}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+        <h4 class="fw-bold mb-2">No Customer Orders</h4>
+        <p class="text-muted">No orders have been submitted to the bookstore yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
