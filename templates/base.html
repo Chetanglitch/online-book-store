@@ -12,8 +12,232 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Custom CSS (Inlined for 100% Guaranteed Hosting & CDN Compatibility) -->
+    <style>
+:root {
+    --primary-color: #1e293b;
+    --primary-dark: #0f172a;
+    --accent-color: #f59e0b;
+    --accent-hover: #d97706;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+}
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.page-content { flex: 1; }
+h1, h2, h3, .serif-font { font-family: 'Playfair Display', serif; }
+.top-announcement {
+    background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
+    letter-spacing: 0.3px;
+}
+.main-navbar {
+    background-color: var(--primary-dark) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.brand-icon { font-size: 1.4rem; color: var(--accent-color); }
+.brand-text { font-size: 1.35rem; color: #ffffff; letter-spacing: -0.5px; }
+.brand-text strong { color: var(--accent-color); }
+.search-bar-form { width: 100%; max-width: 380px; }
+.search-bar-form .form-control {
+    background-color: #1e293b;
+    color: #fff;
+    border-radius: 20px 0 0 20px;
+    font-size: 0.9rem;
+}
+.search-bar-form .form-control::placeholder { color: #94a3b8; }
+.search-bar-form .btn-search {
+    background-color: var(--accent-color);
+    border-radius: 0 20px 20px 0;
+}
+.search-bar-form .btn-search:hover { background-color: var(--accent-hover); }
+.cart-nav-btn { color: #e2e8f0 !important; transition: transform 0.2s; }
+.cart-nav-btn:hover { transform: scale(1.08); color: var(--accent-color) !important; }
+.cart-badge { font-size: 0.7rem; padding: 0.3em 0.55em; }
+.user-pill {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff !important;
+}
+.user-avatar-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-accent {
+    background-color: var(--accent-color);
+    color: #0f172a;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-accent:hover { background-color: var(--accent-hover); color: #ffffff; }
+.text-accent { color: var(--accent-color) !important; }
+.hero-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
+    color: #ffffff;
+    padding: 4.5rem 0;
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+}
+.hero-title { font-size: 2.8rem; font-weight: 700; line-height: 1.15; }
+.features-strip {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+}
+.feature-box { display: flex; align-items: center; gap: 1rem; }
+.feature-icon-wrapper {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #fef3c7;
+    color: #d97706;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+.book-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.book-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+.book-card-cover-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 130%;
+    background-color: #f1f5f9;
+    overflow: hidden;
+}
+.book-card-cover-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.book-card:hover .book-card-cover-wrapper img { transform: scale(1.05); }
+.book-card-body { padding: 1.1rem; display: flex; flex-direction: column; flex: 1; }
+.book-card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.35rem;
+    line-height: 1.35;
+}
+.book-card-author { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.5rem; }
+.book-card-price { font-size: 1.25rem; font-weight: 800; color: #0f172a; }
+.book-card-original-price { text-decoration: line-through; color: #94a3b8; font-size: 0.88rem; }
+.rating-stars { color: #f59e0b; font-size: 0.85rem; }
+.category-pill {
+    display: inline-block;
+    padding: 0.45rem 1rem;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+.category-pill:hover, .category-pill.active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+}
+.detail-cover-box {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background: #fff;
+    border: 1px solid var(--border-color);
+    max-width: 400px;
+    margin: 0 auto;
+}
+.detail-cover-box img { width: 100%; height: auto; display: block; }
+.custom-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-top: none;
+}
+.custom-table td { vertical-align: middle; }
+.metric-card {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 1.4rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+.metric-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.metric-icon.blue { background-color: #e0f2fe; color: #0284c7; }
+.metric-icon.green { background-color: #dcfce7; color: #16a34a; }
+.metric-icon.amber { background-color: #fef3c7; color: #d97706; }
+.metric-icon.purple { background-color: #f3e8ff; color: #9333ea; }
+.footer-section { background-color: #0b1120; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-block;
+    margin-bottom: 0.45rem;
+}
+.footer-links a:hover { color: var(--accent-color); transform: translateX(3px); }
+.student-project-card { background-color: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -211,9 +435,22 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- Main Client Script (Inlined for Guaranteed Compatibility) -->
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const alerts = document.querySelectorAll('.alert-dismissible');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            if (bsAlert) { bsAlert.close(); }
+        }, 6000);
+    });
+    const printReceiptBtn = document.getElementById("printReceiptBtn");
+    if (printReceiptBtn) {
+        printReceiptBtn.addEventListener("click", () => { window.print(); });
+    }
+});
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
